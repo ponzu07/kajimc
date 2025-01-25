@@ -1,0 +1,48 @@
+services:
+  nginx:
+    container_name: kagimc_nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+    networks:
+      - proxy-network
+    restart: unless-stopped
+    environment:
+      NAME1: ${NAME1}
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+
+  crafty:
+    container_name: crafty_container
+    image: registry.gitlab.com/crafty-controller/crafty-4:latest
+    restart: always
+    environment:
+        TZ: ${TZ}
+        PUID: ${PUID}
+        PGID: ${PGID}
+    expose:
+        - "8443" # HTTPS
+    ports:
+        # - "8123:8123" # DYNMAP
+        # - "19132:19132/udp" # BEDROCK
+        - "25500-25600:25500-25600" # MC SERV PORT RANGE
+    volumes:
+        - ./crafty_container/backups:/crafty/backups
+        - ./crafty_container/logs:/crafty/logs
+        - ./crafty_container/servers:/crafty/servers
+        - ./crafty_container/config:/crafty/app/config
+        - ./crafty_container/import:/crafty/import
+    networks:
+        - proxy-network
+    depends_on:
+        - nginx
+
+networks:
+  proxy-network:
+    driver: bridge
