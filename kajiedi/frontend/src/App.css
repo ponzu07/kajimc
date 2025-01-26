@@ -1,0 +1,214 @@
+:root {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #252526;
+  --bg-tertiary: #333333;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #454545;
+  --accent-color: #0078d4;
+  --header-height: 48px;
+  --item-height: 24px;
+  --icon-size: 16px;
+  --toggle-size: 16px;
+  --base-indent: 12px;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+}
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: var(--header-height);
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.header h1 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.split-view {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.gutter {
+  background-color: var(--bg-secondary);
+  position: relative;
+}
+
+.gutter:hover {
+  background-color: var(--accent-color);
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+}
+
+.file-explorer {
+  background-color: var(--bg-secondary);
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+}
+
+/* File Tree */
+.file-tree {
+  padding: var(--base-indent);
+  user-select: none;
+}
+
+.file-item-container {
+  position: relative;
+  margin: 1px 0;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  min-height: var(--item-height);
+  padding: 2px var(--base-indent);
+  cursor: pointer;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  position: relative;
+}
+
+/* Fixed indentation levels */
+.file-item[data-depth="0"] .icon { margin-left: calc(var(--toggle-size) * 1); }
+.file-item[data-depth="1"] .icon { margin-left: calc(var(--toggle-size) * 2); }
+.file-item[data-depth="2"] .icon { margin-left: calc(var(--toggle-size) * 3); }
+.file-item[data-depth="3"] .icon { margin-left: calc(var(--toggle-size) * 4); }
+.file-item[data-depth="4"] .icon { margin-left: calc(var(--toggle-size) * 5); }
+.file-item[data-depth="5"] .icon { margin-left: calc(var(--toggle-size) * 6); }
+
+/* Directory and File Items */
+.file-item.directory {
+  font-weight: 500;
+}
+
+.file-item.file-entry {
+  font-size: 0.95em;
+}
+
+.file-item.file-entry .file-name {
+  opacity: 0.9;
+}
+
+.file-item.file-entry:hover .file-name {
+  opacity: 1;
+}
+
+/* Toggle Button */
+.toggle {
+  position: absolute;
+  left: 4px;
+  width: var(--toggle-size);
+  height: var(--toggle-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.file-item:hover .toggle {
+  opacity: 1;
+}
+
+/* Icons */
+.icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  margin-right: var(--base-indent);
+  background-size: contain;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
+.icon.folder {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23dcb67a' d='M20,6H12L10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8A2,2 0 0,0 20,6Z'/%3E%3C/svg%3E");
+}
+
+.icon.file {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23cccccc' d='M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z'/%3E%3C/svg%3E");
+  opacity: 0.8;
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Hover and Selection States */
+.file-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.file-item.selected {
+  background-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+/* Children Container */
+.file-children {
+  position: relative;
+  display: none;
+}
+
+.file-children.expanded {
+  display: block;
+}
+
+/* Tree Guide Lines */
+.file-children::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--toggle-size) * 0.75);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--border-color);
+  opacity: 0.5;
+}
+
+/* Loading and Error States */
+.error {
+  color: #ff6b6b;
+  padding: var(--base-indent);
+  margin: var(--base-indent);
+  border: 1px solid #ff6b6b;
+  border-radius: 4px;
+  background-color: rgba(255, 107, 107, 0.1);
+}

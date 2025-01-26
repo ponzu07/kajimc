@@ -1,0 +1,107 @@
+[2025-01-26T01:43:39.149Z] INFO: Reading files from: /lua/computer
+[2025-01-26T01:43:39.149Z] DEBUG: Reading directory: /lua/computer
+[2025-01-26T01:43:39.149Z] DEBUG: Found 2 entries in /lua/computer
+[2025-01-26T01:43:39.150Z] DEBUG: Processing entry: {"name":"1","path":"1","isDirectory":true,"size":22}
+[2025-01-26T01:43:39.150Z] DEBUG: Reading directory: /lua/computer/1
+[2025-01-26T01:43:39.151Z] DEBUG: Processing entry: {"name":"3","path":"3","isDirectory":true,"size":37}
+[2025-01-26T01:43:39.151Z] DEBUG: Reading directory: /lua/computer/3
+[2025-01-26T01:43:39.151Z] DEBUG: Found 1 entries in /lua/computer/1
+[2025-01-26T01:43:39.151Z] DEBUG: Found 2 entries in /lua/computer/3
+[2025-01-26T01:43:39.152Z] DEBUG: Processing entry: {"name":"test.lua","path":"1/test.lua","isDirectory":false,"size":308}
+[2025-01-26T01:43:39.152Z] DEBUG: Processing entry: {"name":"aaa.lua","path":"3/aaa.lua","isDirectory":false,"size":8}
+[2025-01-26T01:43:39.152Z] DEBUG: Processing entry: {"name":"tree.lua","path":"3/tree.lua","isDirectory":false,"size":1162}
+[2025-01-26T01:43:39.152Z] DEBUG: Directory contents: [
+  {
+    "name": "1",
+    "path": "1",
+    "isDirectory": true,
+    "size": 22,
+    "modifiedAt": "2025-01-25T16:57:22.405Z",
+    "children": [
+      {
+        "name": "test.lua",
+        "path": "1/test.lua",
+        "isDirectory": false,
+        "size": 308,
+        "modifiedAt": "2025-01-25T16:57:22.405Z"
+      }
+    ]
+  },
+  {
+    "name": "3",
+    "path": "3",
+    "isDirectory": true,
+    "size": 37,
+    "modifiedAt": "2025-01-25T16:57:22.405Z",
+    "children": [
+      {
+        "name": "aaa.lua",
+        "path": "3/aaa.lua",
+        "isDirectory": false,
+        "size": 8,
+        "modifiedAt": "2025-01-25T17:00:25.186Z"
+      },
+      {
+        "name": "tree.lua",
+        "path": "3/tree.lua",
+        "isDirectory": false,
+        "size": 1162,
+        "modifiedAt": "2025-01-25T16:57:22.405Z"
+      }
+    ]
+  }
+]
+[2025-01-26T02:08:06.392Z] INFO: Server running on port 3000
+[2025-01-26T02:08:12.901Z] INFO: Reading files from: /lua/computer
+[2025-01-26T02:08:12.901Z] DEBUG: Reading directory: /lua/computer
+[2025-01-26T02:08:12.903Z] DEBUG: Found 2 entries in /lua/computer
+[2025-01-26T02:08:12.903Z] DEBUG: Processing entry: {"name":"1","path":"1","isDirectory":true,"size":22}
+[2025-01-26T02:08:12.903Z] DEBUG: Reading directory: /lua/computer/1
+[2025-01-26T02:08:12.904Z] DEBUG: Processing entry: {"name":"3","path":"3","isDirectory":true,"size":37}
+[2025-01-26T02:08:12.904Z] DEBUG: Reading directory: /lua/computer/3
+[2025-01-26T02:08:12.904Z] DEBUG: Found 1 entries in /lua/computer/1
+[2025-01-26T02:08:12.905Z] DEBUG: Found 2 entries in /lua/computer/3
+[2025-01-26T02:08:12.905Z] DEBUG: Processing entry: {"name":"test.lua","path":"1/test.lua","isDirectory":false,"size":308}
+[2025-01-26T02:08:12.906Z] DEBUG: Processing entry: {"name":"aaa.lua","path":"3/aaa.lua","isDirectory":false,"size":8}
+[2025-01-26T02:08:12.906Z] DEBUG: Processing entry: {"name":"tree.lua","path":"3/tree.lua","isDirectory":false,"size":1162}
+[2025-01-26T02:08:12.906Z] DEBUG: Directory contents: [
+  {
+    "name": "1",
+    "path": "1",
+    "isDirectory": true,
+    "size": 22,
+    "modifiedAt": "2025-01-25T16:57:22.405Z",
+    "children": [
+      {
+        "name": "test.lua",
+        "path": "1/test.lua",
+        "isDirectory": false,
+        "size": 308,
+        "modifiedAt": "2025-01-25T16:57:22.405Z"
+      }
+    ]
+  },
+  {
+    "name": "3",
+    "path": "3",
+    "isDirectory": true,
+    "size": 37,
+    "modifiedAt": "2025-01-25T16:57:22.405Z",
+    "children": [
+      {
+        "name": "aaa.lua",
+        "path": "3/aaa.lua",
+        "isDirectory": false,
+        "size": 8,
+        "modifiedAt": "2025-01-25T17:00:25.186Z"
+      },
+      {
+        "name": "tree.lua",
+        "path": "3/tree.lua",
+        "isDirectory": false,
+        "size": 1162,
+        "modifiedAt": "2025-01-25T16:57:22.405Z"
+      }
+    ]
+  }
+]
