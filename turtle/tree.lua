@@ -6,7 +6,6 @@ ALL_COUNT = 15
 ueta = 0
 
 function kikori()
-  print("kikori")
   turtle.dig()
   turtle.forward()
   k_count = 0
@@ -30,7 +29,6 @@ function ueru()
     -- 苗木
     turtle.select(NAEGI)
     turtle.place()
-    ueta = ueta + 1
     ukai()
 end
 
@@ -39,11 +37,9 @@ function ukai()
     turtle.forward()
     turtle.forward()
     turtle.down()
-    ueta = ueta + 1
 end
 
 turtle.refuel(1)
-ueta = 0
 sayuu_f = 1
 while true do
     -- 初期化
@@ -88,5 +84,6 @@ while true do
         if turtle.compare() then
             ukai()
         end
+        ueta = ueta + 1
     end
 end
