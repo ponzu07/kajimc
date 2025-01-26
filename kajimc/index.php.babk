@@ -1,0 +1,377 @@
+<?php
+// デバッグログ設定
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', '/var/log/php/debug.log');
+
+function debugLog($message) {
+    error_log("[DEBUG] " . print_r($message, true));
+}
+
+// リクエスト情報をログに記録
+debugLog("REQUEST METHOD: " . $_SERVER['REQUEST_METHOD']);
+debugLog("CONTENT TYPE: " . $_SERVER['CONTENT_TYPE'] ?? 'not set');
+debugLog("POST data: " . print_r($_POST, true));
+debugLog("FILES data: " . print_r($_FILES, true));
+
+// 管理者IPアドレスチェック
+$isAdmin = false;
+$clientIp = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+debugLog("Client IP: " . $clientIp);
+if ($clientIp === '***REMOVED***') {
+    $isAdmin = true;
+    debugLog("Admin access granted");
+}
+
+// アップロード処理
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['modFile'])) {
+    debugLog("アップロード処理開始");
+    try {
+        if (empty($_POST['modName'])) {
+            throw new Exception('Mod名を入力してください');
+        }
+
+        if (!isset($_FILES['modFile']) || $_FILES['modFile']['error'] !== UPLOAD_ERR_OK) {
+            debugLog("ファイルアップロードエラー: " . $_FILES['modFile']['error']);
+            throw new Exception('ファイルのアップロードに失敗しました（エラーコード: ' . $_FILES['modFile']['error'] . '）');
+        }
+
+        $uploadDir = __DIR__ . '/mod/';
+        $jsonFile = $uploadDir . 'mods.json';
+        
+        debugLog("アップロードディレクトリ: " . $uploadDir);
+        debugLog("書き込み権限: " . (is_writable($uploadDir) ? 'あり' : 'なし'));
+
+        // ファイルアップロード
+        $filename = basename($_FILES['modFile']['name']);
+        $uploadFile = $uploadDir . $filename;
+        
+        debugLog("アップロード先ファイルパス: " . $uploadFile);
+        
+        if (move_uploaded_file($_FILES['modFile']['tmp_name'], $uploadFile)) {
+            debugLog("ファイルアップロード成功");
+            
+            // JSONファイル更新
+            $modsData = file_exists($jsonFile) ? json_decode(file_get_contents($jsonFile), true) : ['mods' => []];
+            if (!is_array($modsData)) {
+                $modsData = ['mods' => []];
+            }
+            $modsData['mods'][] = [
+                'name' => $_POST['modName'],
+                'filename' => $filename
+            ];
+            file_put_contents($jsonFile, json_encode($modsData, JSON_PRETTY_PRINT));
+
+            // ZIPファイル作成
+            $zip = new ZipArchive();
+            $zipFile = $uploadDir . 'pack.zip';
+            if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+                foreach ($modsData['mods'] as $mod) {
+                    if (file_exists($uploadDir . $mod['filename'])) {
+                        $zip->addFile($uploadDir . $mod['filename'], $mod['filename']);
+                    }
+                }
+                $zip->close();
+                debugLog("ZIPファイル作成成功");
+            }
+            $message = 'アップロードが完了しました';
+        } else {
+            $phpError = error_get_last();
+            debugLog("ファイル移動エラー: " . print_r($phpError, true));
+            throw new Exception('ファイルの移動に失敗しました: ' . ($phpError['message'] ?? '不明なエラー'));
+        }
+    } catch (Exception $e) {
+        debugLog("エラー発生: " . $e->getMessage());
+        $error = $e->getMessage();
+    }
+}
+
+// Mod削除処理
+if (isset($_POST['delete']) && $isAdmin) {
+    debugLog("削除処理開始");
+    try {
+        $index = (int)$_POST['delete'];
+        $jsonFile = __DIR__ . '/mod/mods.json';
+        $modsData = json_decode(file_get_contents($jsonFile), true);
+        
+        if (isset($modsData['mods'][$index])) {
+            $filename = $modsData['mods'][$index]['filename'];
+            $filepath = __DIR__ . '/mod/' . $filename;
+            if (file_exists($filepath)) {
+                unlink($filepath);
+                debugLog("ファイル削除成功: " . $filepath);
+            }
+            array_splice($modsData['mods'], $index, 1);
+            file_put_contents($jsonFile, json_encode($modsData, JSON_PRETTY_PRINT));
+            
+            // pack.zipの再生成
+            $zip = new ZipArchive();
+            $zipFile = __DIR__ . '/mod/pack.zip';
+            if ($zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+                foreach ($modsData['mods'] as $mod) {
+                    $modPath = __DIR__ . '/mod/' . $mod['filename'];
+                    if (file_exists($modPath)) {
+                        $zip->addFile($modPath, $mod['filename']);
+                    }
+                }
+                $zip->close();
+                debugLog("ZIP再生成成功");
+            }
+        }
+    } catch (Exception $e) {
+        debugLog("削除エラー: " . $e->getMessage());
+        $error = $e->getMessage();
+    }
+}
+
+// 現在のModリストを取得
+$jsonFile = __DIR__ . '/mod/mods.json';
+$modsList = [];
+if (file_exists($jsonFile)) {
+    $modsData = json_decode(file_get_contents($jsonFile), true);
+    if (is_array($modsData) && isset($modsData['mods'])) {
+        $modsList = $modsData['mods'];
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KajiMC - Mod配布ページ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1c2c 0%, #2a4858 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .server-info {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .ip-box {
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            cursor: pointer;
+        }
+
+        .admin-panel {
+            background: rgba(255,255,255,0.15);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .download-section {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+            background: transparent;
+        }
+
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #45a049;
+        }
+
+        .mod-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .mod-card {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+        }
+
+        .mod-name {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .copy-icon {
+            width: 20px;
+            height: 20px;
+            fill: #ffffff;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #dc3545;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #fff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            background: rgba(40, 167, 69, 0.2);
+            color: #fff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .mod-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="server-info">
+            <h1>KajiMC サーバー</h1>
+            <div class="ip-box" onclick="copyIP()">
+                <span id="server-ip">kajimc.copirobo.com</span>
+                <svg class="copy-icon" viewBox="0 0 24 24">
+                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+            </div>
+        </div>
+
+        <?php if ($isAdmin): ?>
+        <div class="admin-panel">
+            <h2>Mod管理パネル</h2>
+            <?php if (isset($error)): ?>
+                <div class="error"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+            <?php if (isset($message)): ?>
+                <div class="message"><?php echo htmlspecialchars($message); ?></div>
+            <?php endif; ?>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="modName">Mod名:</label>
+                    <input type="text" id="modName" name="modName" required>
+                </div>
+                <div class="form-group">
+                    <label for="modFile">Modファイル（最大50MB）:</label>
+                    <input type="file" id="modFile" name="modFile" accept=".jar" required>
+                </div>
+                <button type="submit" class="btn">アップロード</button>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <div class="download-section">
+            <h2>必要なMod一覧</h2>
+            <p>以下のModをすべてインストールしてください</p>
+            <?php if (file_exists(__DIR__ . '/mod/pack.zip')): ?>
+            <a href="/mod/pack.zip" download class="btn">すべてのModをダウンロード</a>
+            <?php endif; ?>
+        </div>
+
+        <div class="mod-list">
+            <?php foreach ($modsList as $index => $mod): ?>
+                <div class="mod-card">
+                    <div class="mod-name"><?php echo htmlspecialchars($mod['name']); ?></div>
+                    <a href="/mod/<?php echo htmlspecialchars($mod['filename']); ?>" download class="btn">ダウンロード</a>
+                    <?php if ($isAdmin): ?>
+                        <form method="POST" style="display: inline;">
+                            <input type="hidden" name="delete" value="<?php echo $index; ?>">
+                            <button type="submit" class="delete-btn" onclick="return confirm('このModを削除してもよろしいですか？')">×</button>
+                        </form>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <script>
+        function copyIP() {
+            const ip = document.getElementById('server-ip').textContent;
+            navigator.clipboard.writeText(ip);
+            alert('サーバーIPをコピーしました！');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+    "mods": [
+        {
+            "name": "CC:Tweaked",
+            "filename": "cc-tweaked-1.21.1-forge-1.114.3.jar"
+        },
+        {
+            "name": "Mekanism",
+            "filename": "Mekanism-1.21.1-10.7.8.70.jar"
+        },
+        {
+            "name": "Ender IO",
+            "filename": "enderio-7.1.5-alpha.jar"
+        },
+        {
+            "name": "Industrial Foregoing",
+            "filename": "industrialforegoing-1.21-3.6.15.jar"
+        },
+        {
+            "name": "mmersive Engineering",
+            "filename": "ImmersiveEngineering-1.21.1-12.0.0-182.jar"
+        },
+        {
+            "name": "Additional Enchanted Miner",
+            "filename": "AdditionalEnchantedMiner-1.21.1-neoforge-21.1.116.jar"
+        },
+        {
+            "name": "Flux Networks",
+            "filename": "FluxNetworks-1.21.1-8.0.0.jar"
+        },
+        {
+            "name": "Applied Energistics 2",
+            "filename": "appliedenergistics2-19.0.27.jar"
+        },
+        {
+            "name": "RFTools Base",
+            "filename": "rftoolsbase-1.21-6.0.3.jar"
+        },
+        {
+            "name": "RFTools Builder",
+            "filename": "rftoolsbuilder-1.21-7.0.1.jar"
+        },
+        {
+            "name": "RFTools Power",
+            "filename": "rftoolspower-1.21-7.0.1.jar"
+        },
+        {
+            "name": "RFTools Power",
+            "filename": "rftoolspower-1.21-7.0.1.jar"
+        },
+        {
+            "name": "McJtyLib",
+            "filename": "mcjtylib-1.21-9.0.5.jar"
+        },
+        {
+            "name": "Scalable Cat's Force",
+            "filename": "ScalableCatsForce-NeoForge-3.6.2-build-0-with-library.jar"
+        },
+        {
+            "name": "Titanium",
+            "filename": "titanium-1.21-4.0.28.jar"
+        },
+        {
+            "name": "Just Enough Items (JEI)",
+            "filename": "jei-1.21.1-neoforge-19.21.0.247.jar"
+        },
+        {
+            "name": "Configured",
+            "filename": "configured-neoforge-1.21.1-2.6.0.jar"
+        },
+        {
+            "name": "Sodium",
+            "filename": "sodium-neoforge-0.6.5+mc1.21.1.jar"
+        },
+        {
+            "name": "FerriteCore",
+            "filename": "ferritecore-7.0.2-neoforge.jar"
+        }
+    ]
+}

@@ -6,12 +6,15 @@ services:
       - "80:80"
     volumes:
       - ./nginx/templates:/etc/nginx/templates
+      - ./kajimc:/var/www/html
+      - ./logs/nginx:/var/log/nginx
     networks:
       - proxy-network
     restart: unless-stopped
     environment:
       NAME1: ${NAME1}
       NAME2: ${NAME2}
+      NAME3: ${NAME3}
       TZ: ${TZ}
       PUID: ${PUID}
       PGID: ${PGID}
@@ -77,6 +80,23 @@ services:
     depends_on:
       - nginx
     restart: unless-stopped
+
+  kajimc-php:
+    container_name: kajimc_php
+    image: php:8.4-fpm
+    volumes:
+      - ./kajimc:/var/www/html
+      - ./logs/php:/var/log/php
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+    user: "${PUID}:${PGID}"
+    networks:
+      - proxy-network
+    restart: unless-stopped
+    depends_on:
+      - nginx
 
 networks:
   proxy-network:
