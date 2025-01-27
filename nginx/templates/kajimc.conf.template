@@ -19,6 +19,7 @@ server {
     }
 
     location / {
+        add_header X-Robots-Tag "noindex" always;
         try_files $uri $uri/ /index.php?$query_string;
     }
 

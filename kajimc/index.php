@@ -183,7 +183,7 @@ $showAdmin = $manager->isAdmin();
         <div class="server-info">
             <h1>KajiMC サーバー</h1>
             <div class="ip-box" onclick="copyIP()">
-                <span id="server-ip">kajimc.copirobo.com</span>
+                <span id="server-ip">mc.copirobo.com</span>
                 <svg class="copy-icon" viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
                     <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
                 </svg>
