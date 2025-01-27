@@ -91,6 +91,7 @@ services:
       TZ: ${TZ}
       PUID: ${PUID}
       PGID: ${PGID}
+      ADMIN_IPS: ${ADMIN_IPS}
     user: "${PUID}:${PGID}"
     networks:
       - proxy-network
