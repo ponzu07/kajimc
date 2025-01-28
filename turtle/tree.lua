@@ -49,6 +49,10 @@ while true do
         ueta = 0
     end
 
+    if turtle.getItemCount(NAEGI) == 0 then
+        break
+    end
+
     if ueta ~= 0 then
         if ueta % ROW_COUNT == 0 then
             turtle.forward()
