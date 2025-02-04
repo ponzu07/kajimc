@@ -2,6 +2,9 @@
 BIRCH_SAPLING = "minecraft:birch_sapling"  -- 白樺の苗木
 BIRCH_LOG = "minecraft:birch_log"          -- 白樺の原木
 COBBLESTONE = "minecraft:cobblestone"      -- 丸石
+CHEST = "minecraft:chest" -- チェスト
+STICK = "minecraft:stick" -- 木の棒
+BONE_MEAL_ID = "minecraft:bone_meal" -- 骨粉
 
 ROW_COUNT = 5
 ALL_COUNT = 15
@@ -17,6 +20,26 @@ function findItem(itemId)
         end
     end
     return false
+end
+
+-- 指定されたアイテムIDを移動する
+function dropItem (itemId)
+    if findItem (itemId) then
+        turtle.drop()
+        return true
+    else
+        return false
+    end
+end
+
+-- 骨粉が手持ちにあれば使用する。
+function useBoneMeal()
+    if findItem("minecraft:bone_meal") then
+        turtle.place()
+        return true
+    else
+        return false
+    end
 end
 
 -- 木を上方向に向かって切る
@@ -71,22 +94,12 @@ function ukai()
     return true
 end
 
--- デバッグ用：インベントリの内容を表示
-function printInventory()
-    for slot = 1, 16 do
-        local item = turtle.getItemDetail(slot)
-        if item then
-            print(string.format("Slot %d: %s", slot, item.name))
-        end
-    end
-end
-
 -- 安全な前進（障害物があれば掘る）
 function safeForward()
     if turtle.detect() then
         local success, block = turtle.inspect()
         if success and block then
-            if block.name == BIRCH_SAPLING or block.name == BIRCH_LOG then
+            if block.name == BIRCH_LOG then
                 turtle.dig()
             end
         end
@@ -97,7 +110,6 @@ end
 -- メインプログラム
 
 print("Current inventory:")
-printInventory()
 
 local sayuu_f = 1
 safeForward() -- 最初の一歩
@@ -105,6 +117,11 @@ safeForward() -- 最初の一歩
 while true do
     -- エリアの終了判定
     if ueta == ALL_COUNT then
+        local success, block = turtle.inspect()
+        if success and block and block.name == CHEST then
+            dropItem(BIRCH_LOG)
+            dropItem(STICK)
+        end
         turtle.turnRight()
         turtle.turnRight()
         ueta = 0
@@ -158,7 +175,5 @@ while true do
         
         ueta = ueta + 1
     end
+    print("Total planted:", ueta)
 end
-
-print("Program finished")
-print("Total planted:", ueta)
